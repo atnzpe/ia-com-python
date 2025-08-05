@@ -6,10 +6,12 @@
 import flet as ft
 import os
 import logging
+
 # ADICIONADO: Importa a função para carregar o arquivo .env
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate
+from langchain_community.document_loaders import WebBaseLoader  #
 
 # ADICIONADO: Carrega as variáveis de ambiente do arquivo .env
 # Esta função deve ser chamada no início do script.
@@ -19,9 +21,9 @@ load_dotenv()
 # 2. CONFIGURAÇÃO DE LOGS
 # -------------------
 logging.basicConfig(
-    filename='chat_app.log',
+    filename="chat_app.log",
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
 # -------------------
@@ -37,20 +39,34 @@ api_key = os.getenv("GROQ_API_KEY")
 if not api_key:
     # Se a chave não for encontrada, loga um erro e encerra a aplicação.
     logging.error("A variável de ambiente GROQ_API_KEY não foi encontrada!")
-    print("ERRO: A chave da API da Groq não foi encontrada. Crie um arquivo .env e defina a variável 'GROQ_API_KEY'.")
+    print(
+        "ERRO: A chave da API da Groq não foi encontrada. Crie um arquivo .env e defina a variável 'GROQ_API_KEY'."
+    )
     exit()  # Encerra o script.
 else:
     logging.info("Chave da API Groq carregada com sucesso do ambiente.")
 
 
 # Inicializa o cliente do chat com o modelo e a chave da API carregada.
-chat = ChatGroq(model='llama-3.3-70b-versatile', groq_api_key=api_key)
+chat = ChatGroq(model="llama-3.3-70b-versatile", groq_api_key=api_key)
 
 # Define a instrução de sistema (personalidade) do bot.
 system_prompt = [
-    ("system", "Você é um assistente prestativo e amigável chamado Seu Blusa. Responda sempre em português do Brasil.")
+    (
+        "system",
+        "Você é um assistente prestativo e amigável chamado Seu Blusa. Responda sempre em português do Brasil.",
+    )
 ]
 logging.info("Cliente do chat e prompt de sistema inicializados.")
+
+
+loader = WebBaseLoader("https://asimov.academy/")
+lista_docuemnts = loader.load()
+
+# Exemplo de como usar o loader para carregar documentos
+# for doc in lista_docuemnts:
+#     documento += doc.page_content
+# print(documento)
 
 
 # -------------------
@@ -62,13 +78,16 @@ class ChatMessage(ft.Row):
         super().__init__()
         self.vertical_alignment = ft.CrossAxisAlignment.START
         self.controls = [
-            ft.CircleAvatar(
-                content=ft.Text(self.get_initials(user_name)),
-                bgcolor=ft.Colors.BLUE_GREY_200,
-            ) if message_type == "user"
-            else ft.CircleAvatar(
-                content=ft.Icon(ft.Icons.SMART_TOY_OUTLINED),
-                bgcolor=ft.Colors.GREEN_200,
+            (
+                ft.CircleAvatar(
+                    content=ft.Text(self.get_initials(user_name)),
+                    bgcolor=ft.Colors.BLUE_GREY_200,
+                )
+                if message_type == "user"
+                else ft.CircleAvatar(
+                    content=ft.Icon(ft.Icons.SMART_TOY_OUTLINED),
+                    bgcolor=ft.Colors.GREEN_200,
+                )
             ),
             ft.Column(
                 [
@@ -103,7 +122,7 @@ def main(page: ft.Page):
             ChatMessage(
                 message="Olá! Eu sou o Seu Blusa. Para começarmos, por favor, digite o seu nome abaixo.",
                 user_name="Seu Blusa",
-                message_type="assistant"
+                message_type="assistant",
             )
         )
         page.update()
@@ -132,7 +151,7 @@ def main(page: ft.Page):
         if not user_message_text.strip():
             page.update()
             return
-        
+
         new_message.value = ""
         logging.info(f"Mensagem recebida do usuário: '{user_message_text}'")
 
@@ -144,24 +163,34 @@ def main(page: ft.Page):
             page.session.set("history", [])
             logging.info(f"Nome do usuário definido como: '{user_name}'")
 
-            chat_list.controls.append(ChatMessage(
-                message=user_name, user_name=user_name, message_type="user"))
+            chat_list.controls.append(
+                ChatMessage(message=user_name, user_name=user_name, message_type="user")
+            )
 
             welcome_message = f"Prazer em conhecê-lo, {user_name}! Qual a sua dúvida?"
             logging.info(f"Enviando mensagem de boas-vindas para {user_name}.")
-            chat_list.controls.append(ChatMessage(
-                message=welcome_message, user_name="Seu Blusa", message_type="assistant"))
+            chat_list.controls.append(
+                ChatMessage(
+                    message=welcome_message,
+                    user_name="Seu Blusa",
+                    message_type="assistant",
+                )
+            )
         else:
-            chat_list.controls.append(ChatMessage(
-                message=user_message_text, user_name=user_name, message_type="user"))
+            chat_list.controls.append(
+                ChatMessage(
+                    message=user_message_text, user_name=user_name, message_type="user"
+                )
+            )
 
             thinking_indicator = ChatMessage(
-                message="pensando...", user_name="Seu Blusa", message_type="assistant")
+                message="pensando...", user_name="Seu Blusa", message_type="assistant"
+            )
             chat_list.controls.append(thinking_indicator)
             page.update()
 
             history = page.session.get("history")
-            history.append(('user', user_message_text))
+            history.append(("user", user_message_text))
 
             prompt_completo = system_prompt + history
             template = ChatPromptTemplate.from_messages(prompt_completo)
@@ -171,12 +200,17 @@ def main(page: ft.Page):
             bot_response_text = chain.invoke({}).content
             logging.info(f"Resposta recebida do modelo: '{bot_response_text}'")
 
-            history.append(('assistant', bot_response_text))
+            history.append(("assistant", bot_response_text))
             page.session.set("history", history)
 
             chat_list.controls.pop()
-            chat_list.controls.append(ChatMessage(
-                message=bot_response_text, user_name="Seu Blusa", message_type="assistant"))
+            chat_list.controls.append(
+                ChatMessage(
+                    message=bot_response_text,
+                    user_name="Seu Blusa",
+                    message_type="assistant",
+                )
+            )
 
         page.update()
         new_message.focus()
@@ -202,6 +236,7 @@ def main(page: ft.Page):
             ]
         ),
     )
+
 
 # -------------------
 # 6. INICIALIZAÇÃO DA APLICAÇÃO
