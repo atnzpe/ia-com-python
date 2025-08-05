@@ -1,0 +1,7 @@
+flet
+langchain
+langchain-groq
+langchain-core
+langchain-openai
+langchain-community
+python-dotenv
