@@ -9,10 +9,13 @@ import os
 import logging
 import re
 
+# Carrega as variáveis de ambiente do arquivo .env
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.document_loaders import YoutubeLoader
+
 
 load_dotenv()
 logging.info("Arquivo .env carregado.")
@@ -62,6 +65,57 @@ def find_url(text: str):
     if match:
         return match.group(0)
     return None
+
+
+def is_youtube_url(url: str):
+    """
+    Verifica se uma URL pertence ao YouTube.
+
+    Args:
+        url (str): A URL a ser verificada.
+
+    Returns:
+        bool: True se for uma URL do YouTube, False caso contrário.
+    """
+    # Padrão para identificar domínios do YouTube (youtube.com e youtu.be).
+    youtube_pattern = r"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([\w-]{11})"
+    # re.match verifica se o padrão corresponde ao início da string.
+    is_match = re.match(youtube_pattern, url)
+    if is_match:
+        logging.info(f"URL identificada como link do YouTube: {url}")
+        return True
+    return False
+
+
+# [ADICIONADO] Nova função para extrair conteúdo de vídeos do YouTube.
+def get_content_from_youtube(url: str):
+    """
+    Carrega a transcrição de um vídeo do YouTube usando YoutubeLoader.
+
+    Args:
+        url (str): A URL do vídeo do YouTube.
+
+    Returns:
+        str | None: A transcrição do vídeo ou None em caso de erro.
+    """
+    logging.info(f"Iniciando carregamento de transcrição do YouTube: {url}")
+    try:
+        # Cria uma instância do YoutubeLoader a partir da URL.
+        loader = YoutubeLoader.from_youtube_url(
+            url, add_video_info=True, language=["pt", "en"]
+        )
+        # Carrega a transcrição.
+        docs = loader.load()
+        # Concatena o conteúdo.
+        content = " ".join([doc.page_content for doc in docs])
+        logging.info(f"Transcrição do YouTube carregada com sucesso para a URL: {url}")
+        return content.strip()
+    except Exception as e:
+        # Em caso de erro (vídeo sem legenda, URL inválida), loga e retorna None.
+        logging.error(
+            f"Falha ao carregar transcrição do YouTube. Erro: {e}", exc_info=True
+        )
+        return None
 
 
 def get_content_from_url(url: str):
@@ -219,22 +273,43 @@ def main(page: ft.Page):
 
         url = find_url(user_message_text)
         if url:
-            web_content = get_content_from_url(url)
-            if web_content:
-                prompt_text = f"""Com base no seguinte conteúdo extraído da página web '{url}':
-                --- CONTEÚDO DA PÁGINA ---
-                {web_content[:4000]} 
+            # Verifica se a URL encontrada é do YouTube.
+            if is_youtube_url(url):
+                # Se for, usa o loader de YouTube.
+                logging.info(f"Processando URL do YouTube: {url}")
+                content = get_content_from_youtube(url)
+                # Define o tipo de conteúdo para o prompt.
+                content_type_for_prompt = "da transcrição do vídeo do YouTube"
+            else:
+                # Se não, usa o loader de página web padrão.
+                logging.info(f"Processando URL de página web: {url}")
+                content = get_content_from_url(url)
+                # Define o tipo de conteúdo para o prompt.
+                content_type_for_prompt = "da página web"
+
+            # Após carregar o conteúdo, monta o prompt adequado.
+            if content:
+                prompt_text = f"""Com base no seguinte conteúdo extraído {content_type_for_prompt} '{url}':
+                --- CONTEÚDO ---
+                {content[:4000]} 
                 --- FIM DO CONTEÚDO ---
                 Responda à pergunta do usuário de forma concisa: '{user_message_text}'"""
+                logging.info(
+                    f"Criando prompt com contexto de {content_type_for_prompt}."
+                )
                 prompt_completo = [("user", prompt_text)]
             else:
+                # Mensagem de erro se não conseguiu carregar o conteúdo.
+                logging.warning(f"Não foi possível carregar o conteúdo do link: {url}")
                 prompt_completo = [
                     (
                         "user",
-                        f"Não consegui acessar o conteúdo do link {url}. Poderia verificar se o link está correto?",
+                        f"Não consegui acessar o conteúdo do link {url}. Poderia verificar se o link está correto ou se o vídeo possui legendas?",
                     )
                 ]
         else:
+            # Se nenhuma URL for encontrada, segue a conversa normal.
+            logging.info("Nenhuma URL detectada. Prosseguindo com conversa normal.")
             prompt_completo = system_prompt + history
 
         template = ChatPromptTemplate.from_messages(prompt_completo)
