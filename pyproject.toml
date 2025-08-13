@@ -10,11 +10,11 @@ build-backend = "setuptools.build_meta"
 name = "chatbot_seu_blusa"
 
 # AQUI é onde você atualiza a versão, sincronizando com a tag do Git.
-version = "0.2.0"
+version = "0.2.3"
 
 # Autores do projeto.
 authors = [
-  { name="Gleyson", email="seu_email@exemplo.com" },
+  { name="Gleyson", email="gleyson@gmail.com" },
 ]
 
 # Uma breve descrição do projeto.
