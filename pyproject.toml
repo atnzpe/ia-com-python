@@ -1,0 +1,53 @@
+# Este arquivo define a configuração do projeto seguindo o padrão PEP 621.
+[build-system]
+# Declara que usamos o 'setuptools' como nosso sistema de construção.
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+# Seção de metadados do projeto.
+[project]
+# O nome do seu pacote quando for distribuído (ex: via pip).
+name = "chatbot_seu_blusa"
+
+# AQUI é onde você atualiza a versão, sincronizando com a tag do Git.
+version = "0.2.0"
+
+# Autores do projeto.
+authors = [
+  { name="Gleyson", email="seu_email@exemplo.com" },
+]
+
+# Uma breve descrição do projeto.
+description = "Um chatbot com interface Flet e IA da Groq que pode analisar conteúdo da web."
+
+# URL da homepage do projeto.
+readme = "README.md"
+
+# Especifica a versão mínima do Python necessária.
+requires-python = ">=3.8"
+
+# Classificadores para ajudar a categorizar seu projeto no PyPI.
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+
+# AQUI ficam as dependências do projeto, substituindo o 'requirements.txt'.
+dependencies = [
+    "flet",
+    "flet_desktop",
+    "flet[all]",
+    "langchain",
+    "langchain-groq",
+    "langchain-core",
+    "langchain-community",
+    "python-dotenv",
+    "beautifulsoup4",
+    "pytest" 
+]
+
+# [opcional] URLs úteis, como o link para o repositório e para reportar bugs.
+[project.urls]
+Homepage = "https://github.com/atnzpe/ia-com-python"
+"Bug Tracker" = "https://github.com/atnzpe/ia-com-python/issues"
