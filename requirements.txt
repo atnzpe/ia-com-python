@@ -1,4 +1,5 @@
-flet
+flet[all]
+flet_desktop
 langchain
 langchain-groq
 langchain-core

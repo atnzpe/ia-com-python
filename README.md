@@ -43,7 +43,10 @@ flet
 langchain
 langchain-groq
 langchain-core
+langchain-openai
+langchain-community
 python-dotenv
+beautifulsoup4
 ```
 E depois instale-o:
 
