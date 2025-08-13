@@ -81,7 +81,7 @@ para pegar a chave.
 
 ## Próximos Passos
 
--   [ ] Dar ao bot acesso a sites.
+-   [x] Dar ao bot acesso a sites.
 -   [ ] Permitir que o bot leia PDFs e vídeos do YouTube.
 -   [ ] Melhorar a estrutura do código.
 -   [ ] Criar um instalador para o projeto.
