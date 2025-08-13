@@ -60,7 +60,6 @@ def find_url(text: str):
     url_pattern = r"https?://\S+"
     match = re.search(url_pattern, text)
     if match:
-        logging.info(f"URL encontrada no texto: {match.group(0)}")
         return match.group(0)
     return None
 
@@ -71,7 +70,6 @@ def get_content_from_url(url: str):
         loader = WebBaseLoader(url)
         docs = loader.load()
         content = " ".join([doc.page_content for doc in docs])
-        logging.info(f"Conteúdo da URL {url} carregado com sucesso.")
         return content.strip()
     except Exception as e:
         logging.error(
@@ -125,24 +123,27 @@ def main(page: ft.Page):
 
     page.session.clear()
 
-    def on_connect(e):
-        logging.info(f"Novo usuário conectado: {page.session_id}")
-        chat_list.controls.append(
+    # [REMOVIDO] A função 'on_connect' foi removida, pois não é a forma
+    # mais confiável de garantir a exibição da mensagem inicial.
+
+    # [LÓGICA ALTERADA] A mensagem de boas-vindas agora é adicionada DIRETAMENTE
+    # na criação do componente 'chat_list'. Isso garante que ela exista
+    # desde o primeiro momento em que a página é renderizada.
+    chat_list = ft.ListView(
+        controls=[
             ChatMessage(
                 message="Olá! Eu sou o Seu Blusa. Para começarmos, qual o seu nome?",
                 user_name="Seu Blusa",
                 message_type="assistant",
             )
-        )
-        page.update()
-
-    page.on_connect = on_connect
-
-    chat_list = ft.ListView(
+        ],
         expand=True,
         spacing=10,
         auto_scroll=True,
     )
+
+    # Log para registrar que a UI foi inicializada com a mensagem de boas-vindas.
+    logging.info("Interface do chat inicializada com a mensagem de boas-vindas.")
 
     new_message = ft.TextField(
         hint_text="Digite seu nome ou sua mensagem...",
@@ -165,21 +166,18 @@ def main(page: ft.Page):
 
         user_name = page.session.get("user_name")
 
-        # [LÓGICA REFORÇADA] Este bloco agora trata da primeira interação de forma
-        # completamente isolada e termina a execução com um 'return'.
+        # [LÓGICA MANTIDA] O fluxo de boas-vindas agora funcionará corretamente,
+        # pois o usuário verá a pergunta inicial e saberá que deve digitar o nome.
         if user_name is None:
-            # 1. A primeira mensagem do usuário é tratada como o nome dele.
             user_name = user_message_text
             page.session.set("user_name", user_name)
             page.session.set("history", [])
             logging.info(f"Nome do usuário definido como: '{user_name}'")
 
-            # 2. Exibe o nome que o usuário digitou como uma mensagem 'dele'.
             chat_list.controls.append(
                 ChatMessage(message=user_name, user_name=user_name, message_type="user")
             )
 
-            # 3. O bot envia a saudação personalizada.
             welcome_message = f"Prazer em conhecê-lo, {user_name}!"
             logging.info(f"Enviando saudação para {user_name}.")
             chat_list.controls.append(
@@ -190,7 +188,6 @@ def main(page: ft.Page):
                 )
             )
 
-            # 4. O bot envia a mensagem de acompanhamento para iniciar a conversa.
             prompt_question_message = "Agora, como posso te ajudar? Faça uma pergunta ou me envie um link para analisar."
             logging.info("Enviando convite para a primeira pergunta.")
             chat_list.controls.append(
@@ -201,15 +198,11 @@ def main(page: ft.Page):
                 )
             )
 
-            # 5. [GARANTIA] Atualiza a página e termina a função aqui.
-            # O `return` impede que o código continue e entre na lógica de IA por engano.
             page.update()
             new_message.focus()
             return
 
-        # --- INÍCIO DA LÓGICA DE CONVERSA NORMAL ---
-        # Este código só será executado se 'user_name' JÁ EXISTIR.
-
+        # Lógica de conversa normal (inalterada)
         chat_list.controls.append(
             ChatMessage(
                 message=user_message_text, user_name=user_name, message_type="user"
@@ -225,9 +218,7 @@ def main(page: ft.Page):
         history.append(("user", user_message_text))
 
         url = find_url(user_message_text)
-
         if url:
-            logging.info(f"Iniciando processamento de URL: {url}")
             web_content = get_content_from_url(url)
             if web_content:
                 prompt_text = f"""Com base no seguinte conteúdo extraído da página web '{url}':
@@ -235,10 +226,8 @@ def main(page: ft.Page):
                 {web_content[:4000]} 
                 --- FIM DO CONTEÚDO ---
                 Responda à pergunta do usuário de forma concisa: '{user_message_text}'"""
-                logging.info("Criando prompt com contexto da web.")
                 prompt_completo = [("user", prompt_text)]
             else:
-                logging.warning(f"Não foi possível carregar o conteúdo da URL: {url}")
                 prompt_completo = [
                     (
                         "user",
@@ -246,15 +235,11 @@ def main(page: ft.Page):
                     )
                 ]
         else:
-            logging.info("Nenhuma URL detectada. Prosseguindo com conversa normal.")
             prompt_completo = system_prompt + history
 
         template = ChatPromptTemplate.from_messages(prompt_completo)
         chain = template | chat
-
-        logging.info("Invocando o modelo de linguagem para gerar resposta...")
         bot_response_text = chain.invoke({}).content
-        logging.info(f"Resposta recebida do modelo: '{bot_response_text}'")
 
         history.append(("assistant", bot_response_text))
         page.session.set("history", history)
