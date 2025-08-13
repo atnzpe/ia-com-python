@@ -9,6 +9,16 @@ import os
 import logging
 import re
 
+# -------------------
+# 2. CONFIGURAÇÃO DE LOGS
+# -------------------
+# (Nenhuma mudança nesta seção)
+logging.basicConfig(
+    filename="chat_app.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
 # Carrega as variáveis de ambiente do arquivo .env
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
@@ -20,15 +30,7 @@ from langchain_community.document_loaders import YoutubeLoader
 load_dotenv()
 logging.info("Arquivo .env carregado.")
 
-# -------------------
-# 2. CONFIGURAÇÃO DE LOGS
-# -------------------
-# (Nenhuma mudança nesta seção)
-logging.basicConfig(
-    filename="chat_app.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
+
 
 # -------------------
 # 3. CONFIGURAÇÃO DO MODELO DE LINGUAGEM (BOT)
@@ -80,7 +82,7 @@ def is_youtube_url(url: str):
     # Padrão para identificar domínios do YouTube (youtube.com e youtu.be).
     youtube_pattern = r"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([\w-]{11})"
     # re.match verifica se o padrão corresponde ao início da string.
-    is_match = re.match(youtube_pattern, url)
+    is_match = re.search(youtube_pattern, url)
     if is_match:
         logging.info(f"URL identificada como link do YouTube: {url}")
         return True

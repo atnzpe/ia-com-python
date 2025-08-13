@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 name = "chatbot_seu_blusa"
 
 # AQUI é onde você atualiza a versão, sincronizando com a tag do Git.
-version = "0.3.0"
+version = "0.3.1"
 
 # Autores do projeto.
 authors = [
@@ -46,8 +46,10 @@ dependencies = [
     "beautifulsoup4",
     "pytest",
     "youtube_transcript-api",
+    "pytube",
     "requests",
-    "pypdf"
+    "pypdf",
+    "logging"
 ]
 
 # [opcional] URLs úteis, como o link para o repositório e para reportar bugs.
