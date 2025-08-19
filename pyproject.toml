@@ -8,17 +8,11 @@ build-backend = "setuptools.build_meta"
 [project]
 # O nome do seu pacote quando for distribuído (ex: via pip).
 name = "chatbot_seu_blusa"
-
 # AQUI é onde você atualiza a versão, sincronizando com a tag do Git.
-version = "0.3.2"
+version = "0.5.1"
 
-# Autores do projeto.
-authors = [
-  { name="Gleyson Atanázio", email="gleysonasilva@gmail.com" },
-]
-
-# Uma breve descrição do projeto.
 description = "Um chatbot com interface Flet e IA da Groq que pode analisar conteúdo da web."
+authors = ["Gleyson Atanazio <gleysonasilva@gmail.com>"]
 
 # URL da homepage do projeto.
 readme = "README.md"
@@ -36,8 +30,7 @@ classifiers = [
 # AQUI ficam as dependências do projeto, substituindo o 'requirements.txt'.
 dependencies = [
     "flet",
-    "flet_desktop",
-    "flet[all]",
+    "flet-desktop",
     "langchain",
     "langchain-groq",
     "langchain-core",
@@ -49,7 +42,6 @@ dependencies = [
     "pytube",
     "requests",
     "pypdf",
-    "logging"
 ]
 
 # [opcional] URLs úteis, como o link para o repositório e para reportar bugs.

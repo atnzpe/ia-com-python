@@ -1,13 +1,15 @@
-# -*- coding: utf-8 -*-
+# -*- main.py -*-
 
 # -------------------
 # 1. IMPORTAÇÕES
 # -------------------
-# (Nenhuma mudança nesta seção)
+
 import flet as ft
 import os
 import logging
 import re
+import sys
+from pypdf import PdfReader
 
 logging.basicConfig(
     filename="chat_app.log",
@@ -20,6 +22,7 @@ from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.document_loaders import YoutubeLoader
+from langchain_community.document_loaders import PyPDFLoader
 
 load_dotenv()
 logging.info("Arquivo .env carregado.")
@@ -27,8 +30,7 @@ logging.info("Arquivo .env carregado.")
 # -------------------
 # 2. CONFIGURAÇÃO DO MODELO DE LINGUAGEM (BOT)
 # -------------------
-# (Nenhuma mudança nesta seção)
-# ... (código do bot inalterado) ...
+
 chat = ChatGroq(model="llama-3.3-70b-versatile", groq_api_key=os.getenv("GROQ_API_KEY"))
 system_prompt = [
     (
@@ -41,7 +43,7 @@ system_prompt = [
 # -------------------
 # 3. FUNÇÕES AUXILIARES
 # -------------------
-# (Nenhuma mudança em find_url e is_youtube_url)
+
 def find_url(text: str):
     url_pattern = r"https?://\S+"
     match = re.search(url_pattern, text)
@@ -57,6 +59,12 @@ def is_youtube_url(url: str):
         return True
     return False
 
+def is_pdf_file_path(text: str):
+    """
+    Verifica se a string é um caminho de arquivo que termina com .pdf.
+    """
+    return text.lower().endswith(".pdf")
+
 
 # [LÓGICA ALTERADA] A função agora retorna uma tupla: (conteúdo, mensagem_de_erro)
 def get_content_from_youtube(url: str):
@@ -70,7 +78,7 @@ def get_content_from_youtube(url: str):
         # [ADICIONADO] Implementando sua sugestão de especificar o idioma.
         # Isso é uma boa prática para priorizar legendas.
         loader = YoutubeLoader.from_youtube_url(
-            url, add_video_info=True, language=["pt", "en"]
+            url, add_video_info=True, language=["pt", "en", "es", "pt-BR"]
         )
         docs = loader.load()
         content = " ".join([doc.page_content for doc in docs])
@@ -109,6 +117,39 @@ def get_content_from_url(url: str):
         )
         # Monta uma mensagem de erro amigável.
         error_message = f"Não consegui acessar a página neste link: {url}. Verifique se o link está correto e se o site está no ar."
+        # Retorna None para o conteúdo e a mensagem de erro.
+        return None, error_message
+    
+def get_content_from_pdf(file_path: str):
+    """
+    Carrega o conteúdo de um arquivo PDF local.
+    Retorna uma tupla (conteúdo, None) em caso de sucesso,
+    ou (None, mensagem_de_erro) em caso de falha.
+    """
+    logging.info(f"Iniciando carregamento do arquivo PDF: {file_path}")
+    try:
+        # Verifica se o arquivo existe e é acessível.
+        if not os.path.exists(file_path):
+            error_message = f"Arquivo PDF não encontrado no caminho: {file_path}"
+            logging.error(error_message)
+            return None, error_message
+
+        # Instancia o PyPDFLoader com o caminho do arquivo.
+        loader = PyPDFLoader(file_path)
+        docs = loader.load()  # Carrega o conteúdo do PDF como uma lista de documentos.
+        
+        # Concatena o conteúdo de todas as páginas em uma única string.
+        content = " ".join([doc.page_content for doc in docs])
+        logging.info(f"Conteúdo do PDF carregado com sucesso para o caminho: {file_path}")
+        
+        # Retorna o conteúdo e None para o erro.
+        return content.strip(), None
+    except Exception as e:
+        logging.error(
+            f"Falha ao carregar o arquivo PDF. Erro: {e}", exc_info=True
+        )
+        # Monta uma mensagem de erro amigável.
+        error_message = f"Não consegui ler o arquivo PDF em: {file_path}. O arquivo pode estar corrompido ou com formato inválido."
         # Retorna None para o conteúdo e a mensagem de erro.
         return None, error_message
 
@@ -233,37 +274,58 @@ def main(page: ft.Page):
 
         # [LÓGICA ALTERADA] O tratamento de erros agora é mais inteligente.
         url = find_url(user_message_text)
+        is_pdf = is_pdf_file_path(user_message_text)
+        content, error_message = None, None
+        
         if url:
             content, error_message = (
                 get_content_from_youtube(url)
                 if is_youtube_url(url)
                 else get_content_from_url(url)
             )
+        
+        elif is_pdf:
+            # [ADICIONADO] Lógica para arquivos PDF.
+            # O usuário pode enviar a pergunta e o caminho do arquivo na mesma mensagem.
+            # Ex: "Resuma o RoteiroViagemEgito.pdf"
+            pdf_path = user_message_text
+            content, error_message = get_content_from_pdf(pdf_path)    
 
-            # Se o conteúdo foi carregado com sucesso...
-            if content:
-                content_type = (
-                    "da transcrição do vídeo do YouTube"
-                    if is_youtube_url(url)
-                    else "da página web"
-                )
-                prompt_text = f"""Com base no seguinte conteúdo extraído {content_type} '{url}':
-                --- CONTEÚDO ---
-                {content[:4000]} 
-                --- FIM DO CONTEÚDO ---
-                Responda à pergunta do usuário de forma concisa: '{user_message_text}'"""
-                # Envia o prompt com contexto para a IA.
-                prompt_completo = [("user", prompt_text)]
-                template = ChatPromptTemplate.from_messages(prompt_completo)
-                chain = template | chat
-                bot_response_text = chain.invoke({}).content
+        if content:
+            # Se o conteúdo foi carregado com sucesso (seja URL ou PDF)...
+            content_type = ""
+            if url and is_youtube_url(url):
+                content_type = "da transcrição do vídeo do YouTube"
+            elif url:
+                content_type = "da página web"
+            elif is_pdf:
+                content_type = "do arquivo PDF"
+                
+            # [LÓGICA ALTERADA] O prompt agora inclui uma instrução para o bot
+            # gerar uma lista se a pergunta sugerir.
+            prompt_text = f"""
+            Com base no seguinte conteúdo extraído {content_type} '{user_message_text}':
+            --- CONTEÚDO ---
+            {content[:4000]} 
+            --- FIM DO CONTEÚDO ---
+            
+            Responda à pergunta do usuário de forma concisa e útil. 
+            Se a pergunta sugerir uma lista (ex: "cite", "liste", "quais são"), 
+            formate a resposta como uma lista, usando marcadores ou numeração.
+            
+            Pergunta do usuário: '{user_message_text}'"""
+            
+            # Envia o prompt com contexto para a IA.
+            prompt_completo = [("user", prompt_text)]
+            template = ChatPromptTemplate.from_messages(prompt_completo)
+            chain = template | chat
+            bot_response_text = chain.invoke({}).content
+        elif error_message:
             # Se houve um erro ao carregar...
-            else:
-                # Usa a mensagem de erro específica retornada pela função de carregamento.
-                bot_response_text = error_message
-
-        # Se não for uma URL, segue a conversa normal...
+            # Usa a mensagem de erro específica retornada pela função de carregamento.
+            bot_response_text = error_message
         else:
+            # Se não for uma URL ou PDF, segue a conversa normal...
             history.append(("user", user_message_text))
             template = ChatPromptTemplate.from_messages(system_prompt + history)
             chain = template | chat
