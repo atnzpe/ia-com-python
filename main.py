@@ -1,9 +1,8 @@
-# -*- main.py -*-
+# -*main.py 12:51 19/08/2025*-
 
 # -------------------
 # 1. IMPORTAÇÕES
 # -------------------
-
 import flet as ft
 import os
 import logging
@@ -65,8 +64,6 @@ def is_pdf_file_path(text: str):
     """
     return text.lower().endswith(".pdf")
 
-
-# [LÓGICA ALTERADA] A função agora retorna uma tupla: (conteúdo, mensagem_de_erro)
 def get_content_from_youtube(url: str):
     """
     Carrega a transcrição de um vídeo do YouTube.
@@ -75,28 +72,20 @@ def get_content_from_youtube(url: str):
     """
     logging.info(f"Iniciando carregamento de transcrição do YouTube: {url}")
     try:
-        # [ADICIONADO] Implementando sua sugestão de especificar o idioma.
-        # Isso é uma boa prática para priorizar legendas.
         loader = YoutubeLoader.from_youtube_url(
             url, add_video_info=True, language=["pt", "en", "es", "pt-BR"]
         )
         docs = loader.load()
         content = " ".join([doc.page_content for doc in docs])
         logging.info(f"Transcrição do YouTube carregada com sucesso para a URL: {url}")
-        # Retorna o conteúdo e None para o erro.
         return content.strip(), None
     except Exception as e:
-        # Em caso de erro, loga a exceção completa.
         logging.error(
             f"Falha ao carregar transcrição do YouTube. Erro: {e}", exc_info=True
         )
-        # Monta uma mensagem de erro amigável e útil para o usuário.
         error_message = f"Não consegui processar o vídeo do YouTube deste link: {url}. O vídeo pode ser privado, ter restrição de idade ou estar indisponível. Por favor, tente com outro link."
-        # Retorna None para o conteúdo e a mensagem de erro.
         return None, error_message
 
-
-# [LÓGICA ALTERADA] A função agora retorna uma tupla: (conteúdo, mensagem_de_erro)
 def get_content_from_url(url: str):
     """
     Carrega o conteúdo de uma página web padrão.
@@ -109,15 +98,12 @@ def get_content_from_url(url: str):
         docs = loader.load()
         content = " ".join([doc.page_content for doc in docs])
         logging.info(f"Conteúdo da URL padrão carregado com sucesso para a URL: {url}")
-        # Retorna o conteúdo e None para o erro.
         return content.strip(), None
     except Exception as e:
         logging.error(
             f"Falha ao carregar conteúdo da URL padrão. Erro: {e}", exc_info=True
         )
-        # Monta uma mensagem de erro amigável.
         error_message = f"Não consegui acessar a página neste link: {url}. Verifique se o link está correto e se o site está no ar."
-        # Retorna None para o conteúdo e a mensagem de erro.
         return None, error_message
     
 def get_content_from_pdf(file_path: str):
@@ -128,36 +114,28 @@ def get_content_from_pdf(file_path: str):
     """
     logging.info(f"Iniciando carregamento do arquivo PDF: {file_path}")
     try:
-        # Verifica se o arquivo existe e é acessível.
         if not os.path.exists(file_path):
             error_message = f"Arquivo PDF não encontrado no caminho: {file_path}"
             logging.error(error_message)
             return None, error_message
 
-        # Instancia o PyPDFLoader com o caminho do arquivo.
         loader = PyPDFLoader(file_path)
-        docs = loader.load()  # Carrega o conteúdo do PDF como uma lista de documentos.
+        docs = loader.load()
         
-        # Concatena o conteúdo de todas as páginas em uma única string.
         content = " ".join([doc.page_content for doc in docs])
         logging.info(f"Conteúdo do PDF carregado com sucesso para o caminho: {file_path}")
         
-        # Retorna o conteúdo e None para o erro.
         return content.strip(), None
     except Exception as e:
         logging.error(
             f"Falha ao carregar o arquivo PDF. Erro: {e}", exc_info=True
         )
-        # Monta uma mensagem de erro amigável.
         error_message = f"Não consegui ler o arquivo PDF em: {file_path}. O arquivo pode estar corrompido ou com formato inválido."
-        # Retorna None para o conteúdo e a mensagem de erro.
         return None, error_message
-
 
 # -------------------
 # 4. COMPONENTE DE MENSAGEM DA INTERFACE (FLET)
 # -------------------
-# (Nenhuma mudança nesta seção)
 class ChatMessage(ft.Row):
     def __init__(self, message: str, user_name: str, message_type: str):
         super().__init__()
@@ -192,12 +170,15 @@ class ChatMessage(ft.Row):
 # 5. FUNÇÃO PRINCIPAL DA APLICAÇÃO (FLET)
 # -------------------
 def main(page: ft.Page):
-    # (Nenhuma mudança nesta seção)
     page.title = "Chat com Seu Blusa"
     page.horizontal_alignment = ft.CrossAxisAlignment.STRETCH
     page.vertical_alignment = ft.CrossAxisAlignment.STRETCH
     page.theme_mode = ft.ThemeMode.LIGHT
     page.session.clear()
+
+    # [ADICIONADO] Cria a variável para o FilePicker
+    file_picker = ft.FilePicker(on_result=lambda e: on_dialog_result(e, page, new_message, chat_list))
+    page.overlay.append(file_picker)
 
     chat_list = ft.ListView(
         controls=[
@@ -234,7 +215,6 @@ def main(page: ft.Page):
         user_name = page.session.get("user_name")
 
         if user_name is None:
-            # ... (Lógica de onboarding inalterada) ...
             user_name = user_message_text
             page.session.set("user_name", user_name)
             page.session.set("history", [])
@@ -271,28 +251,27 @@ def main(page: ft.Page):
         page.update()
 
         history = page.session.get("history")
-
-        # [LÓGICA ALTERADA] O tratamento de erros agora é mais inteligente.
+        
         url = find_url(user_message_text)
         is_pdf = is_pdf_file_path(user_message_text)
         content, error_message = None, None
-        
+
         if url:
             content, error_message = (
                 get_content_from_youtube(url)
                 if is_youtube_url(url)
                 else get_content_from_url(url)
             )
-        
         elif is_pdf:
-            # [ADICIONADO] Lógica para arquivos PDF.
-            # O usuário pode enviar a pergunta e o caminho do arquivo na mesma mensagem.
-            # Ex: "Resuma o RoteiroViagemEgito.pdf"
             pdf_path = user_message_text
-            content, error_message = get_content_from_pdf(pdf_path)    
-
+            content, error_message = get_content_from_pdf(pdf_path) 
+        else:
+            history.append(("user", user_message_text))
+            template = ChatPromptTemplate.from_messages(system_prompt + history)
+            chain = template | chat
+            bot_response_text = chain.invoke({}).content
+            
         if content:
-            # Se o conteúdo foi carregado com sucesso (seja URL ou PDF)...
             content_type = ""
             if url and is_youtube_url(url):
                 content_type = "da transcrição do vídeo do YouTube"
@@ -301,8 +280,6 @@ def main(page: ft.Page):
             elif is_pdf:
                 content_type = "do arquivo PDF"
                 
-            # [LÓGICA ALTERADA] O prompt agora inclui uma instrução para o bot
-            # gerar uma lista se a pergunta sugerir.
             prompt_text = f"""
             Com base no seguinte conteúdo extraído {content_type} '{user_message_text}':
             --- CONTEÚDO ---
@@ -315,26 +292,16 @@ def main(page: ft.Page):
             
             Pergunta do usuário: '{user_message_text}'"""
             
-            # Envia o prompt com contexto para a IA.
             prompt_completo = [("user", prompt_text)]
             template = ChatPromptTemplate.from_messages(prompt_completo)
             chain = template | chat
             bot_response_text = chain.invoke({}).content
         elif error_message:
-            # Se houve um erro ao carregar...
-            # Usa a mensagem de erro específica retornada pela função de carregamento.
             bot_response_text = error_message
-        else:
-            # Se não for uma URL ou PDF, segue a conversa normal...
-            history.append(("user", user_message_text))
-            template = ChatPromptTemplate.from_messages(system_prompt + history)
-            chain = template | chat
-            bot_response_text = chain.invoke({}).content
-
-        # Atualiza a UI e o histórico.
+        
         history.append(
             ("user", user_message_text)
-        )  # Adiciona a pergunta original ao histórico
+        )
         history.append(("assistant", bot_response_text))
         page.session.set("history", history)
         chat_list.controls.pop()
@@ -348,8 +315,87 @@ def main(page: ft.Page):
         page.update()
         new_message.focus()
 
-    new_message.on_submit = send_message_click
+    # [ADICIONADO] Função para lidar com o resultado do FilePicker
+    def on_dialog_result(e: ft.FilePickerResultEvent, page: ft.Page, new_message: ft.TextField, chat_list: ft.ListView):
+        """
+        Função de callback chamada quando um arquivo é selecionado.
+        Ela processa o caminho do arquivo e o envia para a função de processamento de PDF.
+        """
+        logging.info("Evento do FilePicker acionado.")
+        if e.files is not None and len(e.files) > 0:
+            file_path = e.files[0].path
+            logging.info(f"Arquivo selecionado: {file_path}")
+            
+            # Envia o caminho do arquivo para a lógica de processamento
+            new_message.value = file_path
+            send_message_click(e)
+
+    # [ADICIONADO] Função para limpar o chat e recomeçar
+    def restart_chat(e):
+        page.session.clear()
+        chat_list.controls.clear()
+        chat_list.controls.append(
+            ChatMessage(
+                message="Olá! Eu sou o Seu Blusa. Para começarmos, qual o seu nome?",
+                user_name="Seu Blusa",
+                message_type="assistant",
+            )
+        )
+        new_message.value = ""
+        new_message.hint_text = "Digite seu nome ou sua mensagem..."
+        new_message.disabled = False
+        send_button.disabled = False
+        page.update()
+        logging.info("Chat reiniciado.")
+
+    # [ADICIONADO] Função para finalizar o chat
+    def end_chat(e):
+        user_name = page.session.get("user_name", "usuário")
+        final_message = f"Até mais, {user_name}!"
+        chat_list.controls.append(
+            ChatMessage(
+                message=final_message, user_name="Seu Blusa", message_type="assistant"
+            )
+        )
+        new_message.disabled = True
+        send_button.disabled = True
+        page.update()
+        logging.info(f"Chat finalizado. Mensagem de despedida enviada para '{user_name}'.")
+
+    # [ADICIONADO] Criação dos botões de ação
+    restart_button = ft.ElevatedButton(
+        "Reiniciar Chat", on_click=restart_chat, icon=ft.Icons.REFRESH
+    )
+    exit_button = ft.ElevatedButton(
+        "Sair", on_click=end_chat, icon=ft.Icons.EXIT_TO_APP
+    )
+    send_button = ft.IconButton(
+        icon=ft.Icons.SEND_ROUNDED,
+        tooltip="Enviar mensagem",
+        on_click=send_message_click,
+    )
+
+    # [ADICIONADO] Botão de upload de PDF
+    pdf_upload_button = ft.IconButton(
+        icon=ft.Icons.UPLOAD_FILE,
+        tooltip="Enviar arquivo PDF",
+        on_click=lambda _: file_picker.pick_files(
+            allowed_extensions=["pdf"],
+            allow_multiple=False,
+        ),
+    )
+    
+    # [ADICIONADO] Organiza os botões de controle em uma linha
+    control_buttons = ft.Row(
+        [
+            restart_button,
+            exit_button,
+        ],
+        alignment=ft.MainAxisAlignment.END,
+    )
+
     page.add(
+        control_buttons,
         ft.Container(
             content=chat_list,
             border=ft.border.all(1, ft.Colors.OUTLINE),
@@ -360,14 +406,14 @@ def main(page: ft.Page):
         ft.Row(
             [
                 new_message,
-                ft.IconButton(
-                    icon=ft.Icons.SEND_ROUNDED,
-                    tooltip="Enviar mensagem",
-                    on_click=send_message_click,
-                ),
+                pdf_upload_button,
+                send_button,
             ]
         ),
     )
+    
+    # [LÓGICA ALTERADA] Vincula a função send_message_click ao evento on_submit do new_message
+    new_message.on_submit = send_message_click
 
 
 # -------------------
