@@ -8,23 +8,19 @@ build-backend = "setuptools.build_meta"
 [project]
 # O nome do seu pacote quando for distribuído (ex: via pip).
 name = "chatbot_seu_blusa"
-
 # AQUI é onde você atualiza a versão, sincronizando com a tag do Git.
-version = "0.2.3"
+version = "0.7.0"
 
-# Autores do projeto.
-authors = [
-  { name="Gleyson Atanázio", email="gleysonasilva@gmail.com" },
-]
-
-# Uma breve descrição do projeto.
 description = "Um chatbot com interface Flet e IA da Groq que pode analisar conteúdo da web."
+authors = [
+    { name = "Gleyson Atanazio", email = "gleysonasilva@gmail.com" }
+]
 
 # URL da homepage do projeto.
 readme = "README.md"
 
 # Especifica a versão mínima do Python necessária.
-requires-python = ">=3.8"
+requires-python = ">=3.8.1"
 
 # Classificadores para ajudar a categorizar seu projeto no PyPI.
 classifiers = [
@@ -36,16 +32,23 @@ classifiers = [
 # AQUI ficam as dependências do projeto, substituindo o 'requirements.txt'.
 dependencies = [
     "flet",
-    "flet_desktop",
-    "flet[all]",
+    "flet-desktop",
     "langchain",
     "langchain-groq",
     "langchain-core",
     "langchain-community",
     "python-dotenv",
     "beautifulsoup4",
-    "pytest" 
+    "pytest",
+    "youtube_transcript-api",
+    "pytubefix",
+    "pytube",
+    "requests",
+    "pypdf",
 ]
+
+[tool.poetry]
+package-mode = false
 
 # [opcional] URLs úteis, como o link para o repositório e para reportar bugs.
 [project.urls]
