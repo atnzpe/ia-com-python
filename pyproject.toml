@@ -41,6 +41,7 @@ dependencies = [
     "beautifulsoup4",
     "pytest",
     "youtube_transcript-api",
+    "pytubefix",
     "pytube",
     "requests",
     "pypdf",

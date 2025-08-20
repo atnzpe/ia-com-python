@@ -2886,6 +2886,35 @@ files = [
 ]
 
 [[package]]
+name = "pytubefix"
+version = "9.3.0"
+description = "Python3 library for downloading YouTube Videos."
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+markers = "python_version < \"3.12\""
+files = [
+    {file = "pytubefix-9.3.0-py3-none-any.whl", hash = "sha256:97aeb82b4467e3bbf6703aafe618072559cc880dc66c94001b85e5718cf2cf17"},
+    {file = "pytubefix-9.3.0.tar.gz", hash = "sha256:bcf7eeb4810f8710d31d6bce071475bd83fbd7ad6c978e32dda9a4802d0b0feb"},
+]
+
+[[package]]
+name = "pytubefix"
+version = "9.4.1"
+description = "Python3 library for downloading YouTube Videos."
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+markers = "python_version >= \"3.12\""
+files = [
+    {file = "pytubefix-9.4.1-py3-none-any.whl", hash = "sha256:e8625c1f1041b1cf91578843b32a3575b81e3eb49a0ad757b3fc7b9772d85680"},
+    {file = "pytubefix-9.4.1.tar.gz", hash = "sha256:a3466cbbe2659f866c2dd91bf8ebdc8256e7494c9c3733292813b313daafcaad"},
+]
+
+[package.dependencies]
+aiohttp = ">=3.12.13"
+
+[[package]]
 name = "pyyaml"
 version = "6.0.2"
 description = "YAML parser and emitter for Python"
@@ -3712,4 +3741,4 @@ cffi = ["cffi (>=1.17) ; python_version >= \"3.13\" and platform_python_implemen
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.8.1"
-content-hash = "349253b997ae7137a68fdaf070b9f6876fdc307c5fb60a02ec044b15255f5fb2"
+content-hash = "51b0066dbc0c74a720af920ecec98c9aaf5ac2ae1a82d8b8eb1defa4dc558593"
