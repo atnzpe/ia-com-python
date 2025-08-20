@@ -8,11 +8,11 @@ Um chatbot de desktop/web chamado "Seu Blusa", construído com Python. Ele usa u
 
 ## Tecnologias Utilizadas
 
-* [cite_start]**Linguagem:** Python 3.9+ 
-* [cite_start]**Interface Gráfica:** Flet 
-* [cite_start]**Inteligência Artificial:** LangChain com a API da Groq (modelo Llama 3) 
-* [cite_start]**Gerenciamento de Dependências:** Poetry 
-* [cite_start]**Outros:** PyPDF (para leitura de arquivos PDF), Pytubefix (para transcrição do YouTube) 
+*  **Linguagem:** Python 3.9+ 
+* **Interface Gráfica:** Flet 
+* **Inteligência Artificial:** LangChain com a API da Groq (modelo Llama 3) 
+* **Gerenciamento de Dependências:** Poetry 
+* **Outros:** PyPDF (para leitura de arquivos PDF), Pytubefix (para transcrição do YouTube) 
 
 ## Versão
 
@@ -20,19 +20,19 @@ Um chatbot de desktop/web chamado "Seu Blusa", construído com Python. Ele usa u
 
 ## Funcionalidades
 
--   [cite_start][x] Interface de chat interativa com histórico de conversas. 
--   [cite_start][x] Análise de conteúdo de páginas web a partir de um link. 
--   [cite_start][x] Leitura e interpretação de documentos PDF via upload. 
--   [cite_start][x] Extração de transcrições de vídeos do YouTube. 
--   [cite_start][x] Controles de chat para reiniciar ou finalizar a conversa. 
--   [cite_start][x] Fluxo de onboarding para personalização com o nome do usuário. 
+-   [x] Interface de chat interativa com histórico de conversas. 
+-   [x] Análise de conteúdo de páginas web a partir de um link. 
+-   [x] Leitura e interpretação de documentos PDF via upload. 
+-   [x] Extração de transcrições de vídeos do YouTube. 
+-   [x] Controles de chat para reiniciar ou finalizar a conversa. 
+-   [x] Fluxo de onboarding para personalização com o nome do usuário. 
 
 ## A Fazer
 
--   [cite_start][ ] Criar uma arquitetura para que o Bot aprenda com as conversas e crie uma base de conhecimento. 
--   [cite_start][ ] Criar um instalador para o projeto (Desktop e APK). 
--   [cite_start][ ] Fazer o Deploy da aplicação no Fly.io. 
--   [cite_start][ ] Evoluir o projeto para um produto comercializável. 
+-   [ ] Criar uma arquitetura para que o Bot aprenda com as conversas e crie uma base de conhecimento. 
+-   [ ] Criar um instalador para o projeto (Desktop e APK). 
+-   [ ] Fazer o Deploy da aplicação no Fly.io. 
+-   [ ] Evoluir o projeto para um produto comercializável. 
 
 ## Como Executar o Projeto
 
@@ -40,8 +40,8 @@ Siga os passos abaixo para configurar e rodar o projeto em seu ambiente local.
 
 ### 1. Pré-requisitos
 
--   [cite_start]Python 3.9 ou superior 
--   Poetry (gerenciador de dependências). [cite_start]Se não tiver, instale com: 
+-   Python 3.9 ou superior 
+-   Poetry (gerenciador de dependências). Se não tiver, instale com: 
     ```bash
     pip install poetry
     ```
