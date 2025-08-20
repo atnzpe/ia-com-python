@@ -10,6 +10,26 @@ Um chatbot de desktop/web chamado "Seu Blusa", construído com Python. Ele usa u
 * **Linguagem:** Python
 * **Interface Gráfica:** Flet
 * **Inteligência Artificial:** LangChain com a API da Groq (modelo Llama 3)
+* **Outros:** PyPDF (para leitura de arquivos PDF)
+
+## Versão
+
+**Versão atual:** v0.7.2
+
+## Feitos
+
+-   [x] Dar ao bot acesso a sites.
+-   [x] Permitir que o bot leia PDFs e vídeos do YouTube.
+-   [x] Adicionar botões de controle de chat (Sair, Reiniciar).
+-   [x] Melhorar a estrutura de conversação inicial (onboarding).
+-   [x] Ao clicar no botão 'Sair', permitir iniciar uma conversa.
+
+## A fazer
+
+-   [ ] Criar uma arquitetura para que o Bot comece a aprender com as conversas que tem com o usuário, para que se torne um bot de atendimento versátil. Ele pode se necessário criar um arquivo de base de conhecimento.
+-   [ ] Criar um instalador para o projeto para APK.
+-   [ ] Fazer o Deploy no Fly.io.
+-   [ ] Criar um produto que possa ser comercializado.
 
 ## Como Executar
 
@@ -19,8 +39,10 @@ Siga os passos abaixo para rodar o projeto.
 
 ```bash
 git clone [https://github.com/atnzpe/ia-com-python.git](https://github.com/atnzpe/ia-com-python.git)
+
 cd ia-com-python
 ```
+
 
 ### 2. Crie um Ambiente Virtual
 
@@ -79,12 +101,7 @@ os.environ['GROQ_API_KEY']
 
 para pegar a chave.
 
-## Próximos Passos
 
--   [x] Dar ao bot acesso a sites.
--   [ ] Permitir que o bot leia PDFs e vídeos do YouTube.
--   [ ] Melhorar a estrutura do código.
--   [ ] Criar um instalador para o projeto.
 
 ## Licença
 
