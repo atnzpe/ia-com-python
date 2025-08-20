@@ -177,13 +177,16 @@ def get_content_from_youtube(url: str):
         error_message = "Não consegui encontrar transcrições para este vídeo. Verifique se as legendas estão ativadas."
         logging.error(f"Erro de transcrição do YouTube. Erro: {e}", exc_info=True)
         return None, error_message
+    # CORREÇÃO: Usando os nomes de exceções corretos para pytubefix.
+    # VideoPrivateError -> VideoPrivate
+    # VideoRegionBlockedError -> VideoRegionBlocked
     except (
-        pytubefix.exceptions.VideoUnavailable,
+        VideoUnavailable,
         urllib.error.HTTPError,
-        pytubefix.exceptions.AgeRestrictedError,
-        pytubefix.exceptions.LiveStreamError,
-        pytubefix.exceptions.VideoPrivateError,
-        pytubefix.exceptions.VideoRegionBlockedError,
+        AgeRestrictedError,
+        LiveStreamError,
+        pytubefix.exceptions.VideoPrivate,
+        pytubefix.exceptions.VideoRegionBlocked,
     ) as e:
         # Captura erros relacionados a restrições do vídeo ou falhas de requisição.
         error_message = f"O vídeo não está disponível ou a requisição foi bloqueada. Verifique o link e tente novamente mais tarde."
