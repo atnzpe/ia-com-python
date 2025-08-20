@@ -1,35 +1,25 @@
-# Este arquivo define a configuração do projeto seguindo o padrão PEP 621.
+# pyproject.toml
+
 [build-system]
-# Declara que usamos o 'setuptools' como nosso sistema de construção.
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
-# Seção de metadados do projeto.
 [project]
-# O nome do seu pacote quando for distribuído (ex: via pip).
-name = "chatbot_seu_blusa"
 # AQUI é onde você atualiza a versão, sincronizando com a tag do Git.
-version = "0.7.0"
-
+name = "chatbot_seu_blusa"
+version = "1.3.2" # Versão atualizada para v1.3.2
 description = "Um chatbot com interface Flet e IA da Groq que pode analisar conteúdo da web."
 authors = [
     { name = "Gleyson Atanazio", email = "gleysonasilva@gmail.com" }
 ]
-
-# URL da homepage do projeto.
 readme = "README.md"
-
-# Especifica a versão mínima do Python necessária.
-requires-python = ">=3.8.1"
-
-# Classificadores para ajudar a categorizar seu projeto no PyPI.
+# CORREÇÃO: Versão do Python atualizada para ser compatível com as dependências.
+requires-python = ">=3.9, <3.14" 
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
 ]
-
-# AQUI ficam as dependências do projeto, substituindo o 'requirements.txt'.
 dependencies = [
     "flet",
     "flet-desktop",
@@ -40,9 +30,8 @@ dependencies = [
     "python-dotenv",
     "beautifulsoup4",
     "pytest",
-    "youtube_transcript-api",
-    "pytubefix",
-    "pytube",
+    "youtube-transcript-api",
+    "pytubefix==9.4.1", # A versão é fixada para garantir a compatibilidade.
     "requests",
     "pypdf",
 ]
@@ -50,7 +39,6 @@ dependencies = [
 [tool.poetry]
 package-mode = false
 
-# [opcional] URLs úteis, como o link para o repositório e para reportar bugs.
 [project.urls]
 Homepage = "https://github.com/atnzpe/ia-com-python"
 "Bug Tracker" = "https://github.com/atnzpe/ia-com-python/issues"
