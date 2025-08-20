@@ -9,6 +9,7 @@ import logging
 import re
 import sys
 from pypdf import PdfReader
+import time
 
 logging.basicConfig(
     filename="chat_app.log",
