@@ -2,44 +2,54 @@
 
 ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 ![License](https://img.shields.io/badge/license-GPLv3-blue.svg)
+![Version](https://img.shields.io/badge/version-v1.4.0-blue)
 
-Um chatbot de desktop/web chamado "Seu Blusa", construído com Python. Ele usa uma interface gráfica interativa para responder às perguntas dos usuários de forma amigável.
+Um chatbot de desktop/web chamado "Seu Blusa", construído com Python. Ele usa uma interface gráfica interativa para responder às perguntas dos usuários de forma amigável, podendo analisar conteúdo de links e documentos.
 
 ## Tecnologias Utilizadas
 
-* **Linguagem:** Python
+* **Linguagem:** Python 3.9+
 * **Interface Gráfica:** Flet
 * **Inteligência Artificial:** LangChain com a API da Groq (modelo Llama 3)
-* **Outros:** PyPDF (para leitura de arquivos PDF)
+* **Gerenciamento de Dependências:** Poetry
+* **Outros:** PyPDF (para leitura de arquivos PDF), Pytubefix (para transcrição do YouTube)
 
 ## Versão
 
-**Versão atual:** v0.7.2
+**Versão atual:** v1.4.0
 
-## Feitos
+## Funcionalidades
 
--   [x] Dar ao bot acesso a sites.
--   [x] Permitir que o bot leia PDFs e vídeos do YouTube.
--   [x] Adicionar botões de controle de chat (Sair, Reiniciar).
--   [x] Melhorar a estrutura de conversação inicial (onboarding).
--   [x] Ao clicar no botão 'Sair', permitir iniciar uma conversa.
+-   [x] Interface de chat interativa com histórico de conversas.
+-   [x] Análise de conteúdo de páginas web a partir de um link.
+-   [x] Leitura e interpretação de documentos PDF via upload.
+-   [x] Extração de transcrições de vídeos do YouTube.
+-   [x] Controles de chat para reiniciar ou finalizar a conversa.
+-   [x] Fluxo de onboarding para personalização com o nome do usuário.
 
-## A fazer
+## A Fazer
 
--   [ ] Criar uma arquitetura para que o Bot comece a aprender com as conversas que tem com o usuário, para que se torne um bot de atendimento versátil. Ele pode se necessário criar um arquivo de base de conhecimento.
--   [ ] Criar um instalador para o projeto para APK.
--   [ ] Fazer o Deploy no Fly.io.
--   [ ] Criar um produto que possa ser comercializado.
+-   [ ] Criar uma arquitetura para que o Bot aprenda com as conversas e crie uma base de conhecimento.
+-   [ ] Criar um instalador para o projeto (Desktop e APK).
+-   [ ] Fazer o Deploy da aplicação no Fly.io.
+-   [ ] Evoluir o projeto para um produto comercializável.
 
-## Como Executar
+## Como Executar o Projeto
 
-Siga os passos abaixo para rodar o projeto.
+Siga os passos abaixo para configurar e rodar o projeto em seu ambiente local.
 
-### 1. Clone o Repositório
+### 1. Pré-requisitos
+
+-   Python 3.9 ou superior
+-   Poetry (gerenciador de dependências). Se não tiver, instale com:
+    ```bash
+    pip install poetry
+    ```
+
+### 2. Clone o Repositório
 
 ```bash
 git clone [https://github.com/atnzpe/ia-com-python.git](https://github.com/atnzpe/ia-com-python.git)
-
 cd ia-com-python
 ```
 
