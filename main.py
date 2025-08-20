@@ -189,7 +189,9 @@ def is_pdf_file_path(text: str):
     # O método `lower()` é usado para garantir que a verificação não seja sensível a maiúsculas/minúsculas.
     is_pdf = text.lower().endswith(".pdf")
     if is_pdf:
-        logging.info(f"O texto '{text}' foi identificado como um caminho de arquivo PDF.")
+        logging.info(
+            f"O texto '{text}' foi identificado como um caminho de arquivo PDF."
+        )
     return is_pdf
 
 
@@ -519,8 +521,10 @@ class MainChatApp:
 
         # Direciona o fluxo da conversa com base no estado.
         if current_state == "awaiting_name":
+            # Passa a mensagem (nome) para o handler.
             self.handle_awaiting_name(user_message_text)
         elif current_state == "awaiting_confirmation":
+            # Passa a resposta de confirmação para o handler.
             self.handle_awaiting_confirmation(user_message_text)
         elif current_state == "onboarding_complete":
             # Adiciona a mensagem do usuário à UI antes de iniciar o processamento.
@@ -537,16 +541,22 @@ class MainChatApp:
 
         # Devolve o foco ao campo de entrada.
         self.new_message.focus()
+        # Adiciona uma chamada final ao update para garantir que a UI esteja sincronizada.
+        self.page.update()
 
     def handle_awaiting_name(self, user_message_text: str):
         """
         Gerencia a lógica quando o aplicativo está esperando o nome do usuário.
+        Adiciona a mensagem do usuário e responde com um pedido de confirmação.
         """
         logging.info("Estado: aguardando nome. Processando nome fornecido.")
-        # Adiciona a mensagem do usuário (o nome) à lista de chat.
+        # CORREÇÃO: Exibe a mensagem do usuário com o nome que ele acabou de digitar,
+        # em vez de "Usuário", para um feedback visual imediato e claro.
         self.chat_list.controls.append(
             ChatMessage(
-                message=user_message_text, user_name="Usuário", message_type="user"
+                message=user_message_text,
+                user_name=user_message_text,
+                message_type="user",
             )
         )
         # Armazena o nome pendente de confirmação na sessão.
@@ -569,21 +579,27 @@ class MainChatApp:
     def handle_awaiting_confirmation(self, user_message_text: str):
         """
         Gerencia a lógica quando o aplicativo está esperando a confirmação do nome.
+        Se a resposta for "sim", o onboarding é concluído. Caso contrário, pede o nome novamente.
         """
         logging.info("Estado: aguardando confirmação. Processando resposta.")
-        # Adiciona a resposta do usuário (Sim/Não) à lista de chat.
+        # Obtém o nome que está pendente de confirmação.
+        pending_name = self.page.session.get("pending_name") or "Usuário"
+
+        # CORREÇÃO: Exibe a resposta de confirmação (ex: "Sim") associada ao nome
+        # que o usuário forneceu anteriormente, mantendo a consistência da conversa.
         self.chat_list.controls.append(
             ChatMessage(
-                message=user_message_text, user_name="Usuário", message_type="user"
+                message=user_message_text, user_name=pending_name, message_type="user"
             )
         )
         # Define uma lista de respostas afirmativas.
         affirmative_responses = ["sim", "s", "ok", "claro", "yes"]
-        # Verifica se a resposta do usuário é afirmativa (ignorando maiúsculas/minúsculas).
+        # Verifica se a resposta do usuário é uma das opções afirmativas.
         if user_message_text.lower() in affirmative_responses:
-            # Se sim, finaliza o onboarding.
+            # Se a confirmação for positiva, o nome pendente é salvo como o nome de usuário definitivo.
             user_name = self.page.session.get("pending_name")
             self.page.session.set("user_name", user_name)
+            # O estado da conversa avança para "onboarding_complete".
             self.page.session.set("onboarding_state", "onboarding_complete")
             logging.info(f"Nome '{user_name}' confirmado. Onboarding concluído.")
             bot_response_text = (
@@ -594,13 +610,14 @@ class MainChatApp:
             )
             self.new_message.hint_text = "Digite sua mensagem ou pergunta..."
         else:
-            # Se não, volta a pedir o nome.
+            # Se a confirmação for negativa, o bot pede um novo nome.
             logging.info("Confirmação de nome negada. Solicitando nome novamente.")
             bot_response_text = "Sem problemas. Qual nome você gostaria de usar?"
+            # O estado da conversa retorna para "awaiting_name" para recomeçar o processo de nomeação.
             self.page.session.set("onboarding_state", "awaiting_name")
             self.new_message.hint_text = "Digite seu nome..."
 
-        # Adiciona a resposta do bot à lista de chat.
+        # Adiciona a resposta final do bot à interface.
         self.chat_list.controls.append(
             ChatMessage(
                 message=bot_response_text,
@@ -614,7 +631,9 @@ class MainChatApp:
         Função assíncrona que gerencia a lógica principal do chat (após o onboarding).
         Processa perguntas, links e PDFs em segundo plano.
         """
-        logging.info(f"Iniciando processamento assíncrono para a mensagem: '{user_message_text}'")
+        logging.info(
+            f"Iniciando processamento assíncrono para a mensagem: '{user_message_text}'"
+        )
         # Adiciona um indicador visual de "analisando..." para dar feedback ao usuário.
         thinking_indicator = ChatMessage(
             message="analisando...", user_name="Seu Blusa", message_type="assistant"
@@ -673,7 +692,7 @@ class MainChatApp:
                 content_type = "da página web"
             elif is_pdf:
                 content_type = "do arquivo PDF"
-            
+
             # Cria um prompt detalhado para a IA, incluindo o conteúdo extraído.
             prompt_text = f"""
             Com base no seguinte conteúdo extraído {content_type} '{user_message_text}':
@@ -694,11 +713,15 @@ class MainChatApp:
             bot_response_text = bot_response.content
         elif error_message:
             # Se houve um erro na extração de conteúdo, a mensagem de erro é a resposta.
-            logging.warning(f"Erro na extração de conteúdo. Respondendo com: {error_message}")
+            logging.warning(
+                f"Erro na extração de conteúdo. Respondendo com: {error_message}"
+            )
             bot_response_text = error_message
         else:
             # Resposta padrão para casos não tratados.
-            logging.error("Nenhum conteúdo extraído e nenhuma mensagem de erro. Usando resposta padrão.")
+            logging.error(
+                "Nenhum conteúdo extraído e nenhuma mensagem de erro. Usando resposta padrão."
+            )
             bot_response_text = "Desculpe, não consegui processar a sua solicitação. Poderia tentar novamente?"
 
         # Remove o indicador "analisando..." e adiciona a resposta final do bot.
@@ -738,7 +761,9 @@ class MainChatApp:
             self.new_message.value = file_path
             self.send_message(e)
         else:
-            logging.warning("Seletor de arquivos foi fechado sem selecionar um arquivo.")
+            logging.warning(
+                "Seletor de arquivos foi fechado sem selecionar um arquivo."
+            )
 
     def restart_chat(self, e):
         """
