@@ -339,13 +339,13 @@ class ChatMessage(ft.Row):
                 # Cria um avatar para o usuário com suas iniciais.
                 ft.CircleAvatar(
                     content=ft.Text(self.get_initials(user_name)),
-                    bgcolor=ft.colors.BLUE_GREY_200,
+                    bgcolor=ft.Colors.BLUE_GREY_200,
                 )
                 if message_type == "user"
                 # Cria um avatar para o chatbot com um ícone.
                 else ft.CircleAvatar(
-                    content=ft.Icon(ft.icons.SMART_TOY_OUTLINED),
-                    bgcolor=ft.colors.GREEN_200,
+                    content=ft.Icon(ft.Icons.SMART_TOY_OUTLINED),
+                    bgcolor=ft.Colors.GREEN_200,
                 )
             ),
             # Cria uma coluna para agrupar o nome do remetente e o texto da mensagem.
@@ -444,12 +444,12 @@ class MainChatApp:
 
         # Cria os botões da interface.
         self.send_button = ft.IconButton(
-            icon=ft.icons.SEND_ROUNDED,
+            icon=ft.Icons.SEND_ROUNDED,
             tooltip="Enviar mensagem",
             on_click=self.send_message,
         )
         self.pdf_upload_button = ft.IconButton(
-            icon=ft.icons.UPLOAD_FILE,
+            icon=ft.Icons.UPLOAD_FILE,
             tooltip="Enviar arquivo PDF",
             # Ao clicar, o `FilePicker` é ativado para selecionar arquivos com extensão .pdf.
             on_click=lambda _: self.file_picker.pick_files(
@@ -458,10 +458,10 @@ class MainChatApp:
             ),
         )
         self.restart_button = ft.ElevatedButton(
-            "Reiniciar Chat", on_click=self.restart_chat, icon=ft.icons.REFRESH
+            "Reiniciar Chat", on_click=self.restart_chat, icon=ft.Icons.REFRESH
         )
         self.exit_button = ft.ElevatedButton(
-            "Sair", on_click=self.end_chat, icon=ft.icons.EXIT_TO_APP
+            "Sair", on_click=self.end_chat, icon=ft.Icons.EXIT_TO_APP
         )
         logging.info("Controles da UI criados com sucesso.")
 
@@ -475,7 +475,7 @@ class MainChatApp:
             ),
             ft.Container(
                 content=self.chat_list,
-                border=ft.border.all(1, ft.colors.OUTLINE),
+                border=ft.border.all(1, ft.Colors.OUTLINE),
                 border_radius=5,
                 padding=10,
                 expand=True,
