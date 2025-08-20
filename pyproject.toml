@@ -32,7 +32,7 @@ dependencies = [
     "pytest",
     "pytube",
     "youtube-transcript-api",
-    "pytubefix==9.4.1", # A versão é fixada para garantir a compatibilidade.
+    "pytubefix", # A versão é fixada para garantir a compatibilidade.
     "requests",
     "pypdf",
 ]

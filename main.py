@@ -25,7 +25,7 @@ from pypdf import PdfReader
 import asyncio
 # Módulo para criar um pool de threads. Usado para executar funções síncronas em segundo plano.
 from concurrent.futures import ThreadPoolExecutor
-
+import pytube
 # Módulo `pytubefix` e suas exceções específicas para o carregamento de vídeos do YouTube.
 # Ele é um fork da biblioteca pytube, mais robusto e atualizado para lidar com as constantes
 # mudanças na API do YouTube.
