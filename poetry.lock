@@ -1704,6 +1704,18 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "pytube"
+version = "15.0.0"
+description = "Python 3 library for downloading YouTube Videos."
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "pytube-15.0.0-py3-none-any.whl", hash = "sha256:07b9904749e213485780d7eb606e5e5b8e4341aa4dccf699160876da00e12d78"},
+    {file = "pytube-15.0.0.tar.gz", hash = "sha256:076052efe76f390dfa24b1194ff821d4e86c17d41cb5562f3a276a8bcbfc9d1d"},
+]
+
+[[package]]
 name = "pytubefix"
 version = "9.4.1"
 description = "Python3 library for downloading YouTube Videos."
@@ -2335,4 +2347,4 @@ cffi = ["cffi (>=1.17) ; python_version >= \"3.13\" and platform_python_implemen
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9, <3.14"
-content-hash = "c8c1d7e097625c220e88bddcc3cc6f79e25fe15bb8f3bb614e01db0dc6575301"
+content-hash = "0fe4b75541ae751ca1221fd99999710d81a8e2f1c6ff836e52e6606d9bec8cc5"

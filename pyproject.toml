@@ -30,6 +30,7 @@ dependencies = [
     "python-dotenv",
     "beautifulsoup4",
     "pytest",
+    "pytube",
     "youtube-transcript-api",
     "pytubefix==9.4.1", # A versão é fixada para garantir a compatibilidade.
     "requests",
